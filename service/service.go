@@ -33,7 +33,7 @@ func (s *ServiceStruct) CreateBook(ctx context.Context, book *models.Book) error
 	if id == 0 {
 		return errors.ErrNotCreated
 	}
-	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix())
+	s.Cache.DeleteKeyByPattern(ctx, commonutility.GetAllBooksKeyPrefix())
 
 	kafka.PublishEvent("create", fmt.Sprint(book.ID), book.Title, book.Author, book.Year)
 	return nil
@@ -86,7 +86,8 @@ func (s *ServiceStruct) UpdateBook(ctx context.Context, id string, book *models.
 		return err
 	}
 
-	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix(), commonutility.GetCacheKey(id))
+	s.Cache.DeleteKey(ctx, commonutility.GetCacheKey(id))
+	s.Cache.DeleteKeyByPattern(ctx, commonutility.GetAllBooksKeyPrefix())
 
 	kafka.PublishEvent("update", fmt.Sprint(book.ID), book.Title, book.Author, book.Year)
 	return nil
@@ -103,7 +104,8 @@ func (s *ServiceStruct) DeleteBook(ctx context.Context, id string) error {
 		return err
 	}
 
-	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix(), commonutility.GetCacheKey(id))
+	s.Cache.DeleteKey(ctx, commonutility.GetCacheKey(id))
+	s.Cache.DeleteKeyByPattern(ctx, commonutility.GetAllBooksKeyPrefix())
 
 	kafka.PublishEvent("delete", fmt.Sprint(id), "", "", 0)
 	return nil

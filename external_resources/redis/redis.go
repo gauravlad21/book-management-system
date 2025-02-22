@@ -20,6 +20,7 @@ type CacheInterface interface {
 	Set(ctx context.Context, keyValue *RedisKeyValue) error
 	SetMultipleKeys(ctx context.Context, keyValues []*RedisKeyValue) error
 	DeleteKey(ctx context.Context, key ...string) (interface{}, error)
+	DeleteKeyByPattern(ctx context.Context, pattern string) (interface{}, error)
 	Get(ctx context.Context, key string) (interface{}, error)
 	GetMultiple(ctx context.Context, keys ...interface{}) ([]string, error)
 	GetAllKeys(ctx context.Context, patteren ...string) ([]interface{}, error)
@@ -103,6 +104,25 @@ func (client *RedisClient) DeleteKey(ctx context.Context, key ...string) (interf
 		return nil, err
 	}
 	return value, nil
+}
+
+func (client *RedisClient) DeleteKeyByPattern(ctx context.Context, pattern string) (interface{}, error) {
+	redisConn := client.pool.Get()
+	defer closeConnection(ctx, redisConn)
+
+	keys, err := redis.Values(redisConn.Do("KEYS", pattern))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, k := range keys {
+		_, err = redisConn.Do("DEL", string(k.([]byte)))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return nil, nil
 }
 
 func (client *RedisClient) Get(ctx context.Context, key string) (interface{}, error) {

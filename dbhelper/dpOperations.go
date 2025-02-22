@@ -2,16 +2,14 @@ package dbhelper
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"strconv"
 
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
 	"github.com/gauravlad21/book-management-system/errors"
 	"github.com/gauravlad21/book-management-system/models"
-	"github.com/spf13/viper"
 )
 
 type DbOperationsIF interface {
@@ -27,17 +25,20 @@ type DbOps struct {
 }
 
 func New() DbOperationsIF {
-	host := viper.Get("db.host")
-	user := viper.Get("db.username")
-	pass := viper.Get("db.password")
-	dbname := viper.Get("db.dbname")
-	port := viper.Get("db.port")
+	// host := viper.Get("db.host")
+	// user := viper.Get("db.username")
+	// pass := viper.Get("db.password")
+	// dbname := viper.Get("db.dbname")
+	// port := viper.Get("db.port")
 
-	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable", host, user, pass, dbname, port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=disable", host, user, pass, dbname, port)
+	// db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	db, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
+	MigrateDB(db)
 	return &DbOps{DB: db}
 }
 
