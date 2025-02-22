@@ -17,7 +17,7 @@ import (
 type DbOperationsIF interface {
 	CreateBook(ctx context.Context, book *models.Book) (int, error)
 	ReadBook(ctx context.Context, id string) (*models.Book, error)
-	ReadAllBooks(ctx context.Context) []models.Book
+	ReadAllBooks(ctx context.Context, limit, offset int) []models.Book
 	UpdateBook(ctx context.Context, id string, book *models.Book) error
 	DeleteBook(ctx context.Context, id string) error
 }
@@ -56,9 +56,9 @@ func (d *DbOps) ReadBook(ctx context.Context, id string) (*models.Book, error) {
 	return book, nil
 }
 
-func (d *DbOps) ReadAllBooks(ctx context.Context) []models.Book {
+func (d *DbOps) ReadAllBooks(ctx context.Context, limit, offset int) []models.Book {
 	var books []models.Book
-	d.DB.Find(&books)
+	d.DB.Limit(limit).Offset(offset).Find(&books)
 	return books
 }
 

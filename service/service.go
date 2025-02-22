@@ -31,7 +31,7 @@ func (s *ServiceStruct) CreateBook(ctx context.Context, book *models.Book) error
 	if id == 0 {
 		return errors.ErrNotCreated
 	}
-	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKey())
+	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix())
 	return nil
 }
 
@@ -48,22 +48,25 @@ func (s *ServiceStruct) ReadBook(ctx context.Context, id string) (*models.Book, 
 		return nil, errors.ErrInternal
 	}
 
-	s.Cache.Set(ctx, &epredis.RedisKeyValue{Key: commonutility.GetCacheKey(id), Value: book, ExpiryInMillis: 60 * 1000})
+	bookJson, _ := json.Marshal(book)
+	s.Cache.Set(ctx, &epredis.RedisKeyValue{Key: commonutility.GetCacheKey(id), Value: bookJson, ExpiryInMillis: 60 * 1000})
 
 	return book, nil
 }
 
-func (s *ServiceStruct) ReadAllBooks(ctx context.Context) []models.Book {
+func (s *ServiceStruct) ReadAllBooks(ctx context.Context, limit, offset int) []models.Book {
 
-	cacheKey := commonutility.GetAllBooksKey()
+	cacheKey := commonutility.GetAllBooksKey(limit, offset)
 	if cachedBooks, err := s.Cache.Get(ctx, cacheKey); err == nil {
 		var books []models.Book
 		json.Unmarshal([]byte(cachedBooks.(string)), &books)
 		return books
 	}
 
-	books := s.DbOps.ReadAllBooks(ctx)
-	s.Cache.Set(ctx, &epredis.RedisKeyValue{Key: cacheKey, Value: books, ExpiryInMillis: 60 * 1000})
+	books := s.DbOps.ReadAllBooks(ctx, limit, offset)
+
+	booksJson, _ := json.Marshal(books)
+	s.Cache.Set(ctx, &epredis.RedisKeyValue{Key: cacheKey, Value: booksJson, ExpiryInMillis: 60 * 1000})
 	return books
 }
 
@@ -79,7 +82,7 @@ func (s *ServiceStruct) UpdateBook(ctx context.Context, id string, book *models.
 		return err
 	}
 
-	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKey(), commonutility.GetCacheKey(id))
+	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix(), commonutility.GetCacheKey(id))
 	return nil
 }
 
@@ -94,6 +97,6 @@ func (s *ServiceStruct) DeleteBook(ctx context.Context, id string) error {
 		return err
 	}
 
-	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKey(), commonutility.GetCacheKey(id))
+	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix(), commonutility.GetCacheKey(id))
 	return nil
 }

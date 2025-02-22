@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gauravlad21/book-management-system/commonutility"
 	"github.com/gauravlad21/book-management-system/models"
@@ -38,7 +39,17 @@ func ReadBook(ctx *gin.Context) {
 }
 
 func ReadAllBooks(ctx *gin.Context) {
-	book := serviceRepo.ReadAllBooks(commonutility.GetContext(ctx))
+	limitStr := ctx.Request.URL.Query().Get("limit")
+	offsetStr := ctx.Request.URL.Query().Get("offset")
+
+	limit, err1 := strconv.Atoi(limitStr)
+	offset, err2 := strconv.Atoi(offsetStr)
+	if err1 != nil || err2 != nil {
+		limit = 10
+		offset = 0
+	}
+
+	book := serviceRepo.ReadAllBooks(commonutility.GetContext(ctx), limit, offset)
 	ctx.JSON(200, book)
 }
 

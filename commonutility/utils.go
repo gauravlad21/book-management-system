@@ -2,6 +2,7 @@ package commonutility
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +16,10 @@ func GetCacheKey(id string) string {
 	return "BookId::" + id
 }
 
-func GetAllBooksKey() string {
-	return "AllBooks"
+func GetAllBooksKey(limit, offset int) string {
+	return fmt.Sprintf("AllBooks::limit:%v::offset:%v", limit, offset)
+}
+
+func GetAllBooksKeyPrefix() string {
+	return "AllBooks*"
 }
