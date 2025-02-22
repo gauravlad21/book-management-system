@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/gauravlad21/book-management-system/commonutility"
 	"github.com/gauravlad21/book-management-system/errors"
+	epredis "github.com/gauravlad21/book-management-system/external_resources/redis"
 	"github.com/gauravlad21/book-management-system/models"
 
 	"github.com/spf13/viper"
@@ -33,10 +35,21 @@ func (s *ServiceStruct) CreateBook(ctx context.Context, book *models.Book) error
 }
 
 func (s *ServiceStruct) ReadBook(ctx context.Context, id string) (*models.Book, error) {
+
+	if val, err := s.Cache.Get(ctx, commonutility.GetCacheKey(id)); err == nil {
+		book := &models.Book{}
+		json.Unmarshal([]byte(val.(string)), book)
+		return book, nil
+	}
+
 	book, err := s.DbOps.ReadBook(ctx, id)
 	if err != nil {
 		return nil, errors.ErrInternal
 	}
+
+	booksJson, _ := json.Marshal(book)
+	s.Cache.Set(ctx, &epredis.RedisKeyValue{Key: commonutility.GetCacheKey(id), Value: booksJson})
+
 	return book, nil
 }
 

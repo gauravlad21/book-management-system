@@ -48,7 +48,7 @@ func (d *DbOps) CreateBook(ctx context.Context, book *models.Book) (int, error) 
 
 func (d *DbOps) ReadBook(ctx context.Context, id string) (*models.Book, error) {
 	book := &models.Book{}
-	d.DB.First(book, id)
+	d.DB.First(book, "id = ?", id)
 	if fmt.Sprint(book.ID) != id {
 		return nil, errors.ErrNotFound
 	}

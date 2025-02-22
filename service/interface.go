@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gauravlad21/book-management-system/dbhelper"
+	epredis "github.com/gauravlad21/book-management-system/external_resources/redis"
 	"github.com/gauravlad21/book-management-system/models"
 )
 
@@ -16,11 +17,13 @@ type ServiceIF interface {
 
 type ServiceStruct struct {
 	DbOps dbhelper.DbOperationsIF
+	Cache epredis.CacheInterface
 }
 
-func New(dbOps dbhelper.DbOperationsIF) ServiceIF {
+func New(dbOps dbhelper.DbOperationsIF, cache epredis.CacheInterface) ServiceIF {
 
 	return &ServiceStruct{
 		DbOps: dbOps,
+		Cache: cache,
 	}
 }
