@@ -2,8 +2,9 @@ package urlsmappings
 
 import (
 	"github.com/gauravlad21/book-management-system/controller"
-
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 const (
@@ -30,6 +31,7 @@ func init() {
 	urlsMappings = []*urlMap{
 		// testing endpoints
 		{Url: "/hello", Method: GET, Handler: controller.Hello},
+		{Url: "/swagger/*any", Method: GET, Handler: ginSwagger.WrapHandler(swaggerFiles.Handler)},
 
 		// start from here
 		{Url: "/books", Method: POST, Handler: controller.CreateBook},

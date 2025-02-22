@@ -17,6 +17,17 @@ func Hello(ctx *gin.Context) {
 	ctx.JSON(200, msg)
 }
 
+// Create a Book
+// @Summary Create a new book
+// @Description Add a new book to the database
+// @Tags Books
+// @Accept  json
+// @Produce  json
+// @Param book body models.Book true "Book object"
+// @Success 201 {object} models.Book
+// @Failure 400 {object} map[string]string
+// @Router /books [post]
+// @host localhost:5002
 func CreateBook(ctx *gin.Context) {
 	book := &models.Book{}
 	ctx.BindJSON(&book)
@@ -28,6 +39,16 @@ func CreateBook(ctx *gin.Context) {
 	ctx.JSON(200, book)
 }
 
+// Get Book by ID
+// @Summary Get book by ID
+// @Description Retrieve a book by its ID
+// @Tags Books
+// @Produce  json
+// @Param id path int true "Book ID"
+// @Success 200 {object} models.Book
+// @Failure 404 {object} map[string]string
+// @Router /books/{id} [get]
+// @host localhost:5002
 func ReadBook(ctx *gin.Context) {
 	id := ctx.Param("id")
 	book, err := serviceRepo.ReadBook(commonutility.GetContext(ctx), id)
@@ -38,6 +59,14 @@ func ReadBook(ctx *gin.Context) {
 	ctx.JSON(200, book)
 }
 
+// Get All Books
+// @Summary Get all books
+// @Description Retrieve a list of all books
+// @Tags Books
+// @Produce  json
+// @Success 200 {array} models.Book
+// @Router /books [get]
+// @host localhost:5002
 func ReadAllBooks(ctx *gin.Context) {
 	limitStr := ctx.Request.URL.Query().Get("limit")
 	offsetStr := ctx.Request.URL.Query().Get("offset")
@@ -53,6 +82,19 @@ func ReadAllBooks(ctx *gin.Context) {
 	ctx.JSON(200, book)
 }
 
+// Update a Book
+// @Summary Update a book
+// @Description Update an existing book's details
+// @Tags Books
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Book ID"
+// @Param book body models.Book true "Updated book object"
+// @Success 200 {object} models.Book
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /books/{id} [put]
+// @host localhost:5002
 func UpdateBook(ctx *gin.Context) {
 	id := ctx.Param("id")
 	book := &models.Book{}
@@ -65,6 +107,15 @@ func UpdateBook(ctx *gin.Context) {
 	ctx.JSON(200, book)
 }
 
+// Delete a Book
+// @Summary Delete a book
+// @Description Delete a book by ID
+// @Tags Books
+// @Param id path int true "Book ID"
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /books/{id} [delete]
+// @host localhost:5002
 func DeleteBook(ctx *gin.Context) {
 	id := ctx.Param("id")
 	err := serviceRepo.DeleteBook(commonutility.GetContext(ctx), id)

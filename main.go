@@ -12,6 +12,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+
+	_ "github.com/gauravlad21/book-management-system/docs" // Import the generated docs
 )
 
 func startServer(ctx context.Context, port string) {
@@ -48,6 +50,11 @@ func initAndStartServer() {
 	startServer(ctx, port)
 }
 
+// @title Books Management API
+// @version 1.0
+// @description This is a Books Management API using Gin, GORM, Redis, and Kafka.
+// @host localhost:5002
+// @BasePath /
 func main() {
 
 	defaultPath := "default-path"
