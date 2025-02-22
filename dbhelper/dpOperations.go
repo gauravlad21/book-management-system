@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -17,8 +18,8 @@ type DbOperationsIF interface {
 	CreateBook(ctx context.Context, book *models.Book) (int, error)
 	ReadBook(ctx context.Context, id string) (*models.Book, error)
 	ReadAllBooks(ctx context.Context) []models.Book
-	// UpdateBook(ctx context.Context, book *models.Book)
-	// DeleteBook(ctx context.Context, id int)
+	UpdateBook(ctx context.Context, id string, book *models.Book) error
+	DeleteBook(ctx context.Context, id string) error
 }
 
 type DbOps struct {
@@ -48,8 +49,8 @@ func (d *DbOps) CreateBook(ctx context.Context, book *models.Book) (int, error) 
 
 func (d *DbOps) ReadBook(ctx context.Context, id string) (*models.Book, error) {
 	book := &models.Book{}
-	d.DB.First(book, "id = ?", id)
-	if fmt.Sprint(book.ID) != id {
+	tx := d.DB.First(book, "id = ?", id)
+	if tx.Error != nil {
 		return nil, errors.ErrNotFound
 	}
 	return book, nil
@@ -61,10 +62,30 @@ func (d *DbOps) ReadAllBooks(ctx context.Context) []models.Book {
 	return books
 }
 
-// func (d *DbOps) UpdateBook(ctx context.Context, id int, book *models.Book) {
-// 	d.DB.Save(book)
-// }
+func (d *DbOps) UpdateBook(ctx context.Context, id string, book *models.Book) error {
+	oldBook := &models.Book{}
+	if err := d.DB.First(oldBook, "id = ? ", id).Error; err == nil {
+		x, _ := strconv.Atoi(id)
+		book.ID = uint(x)
+		tx := d.DB.Save(book)
+		if tx.Error != nil {
+			return err
+		}
+		tx.Commit()
+		return nil
+	}
+	return errors.ErrNotFound
+}
 
-// func (d *DbOps) DeleteBook(ctx context.Context, id int) {
-
-// }
+func (d *DbOps) DeleteBook(ctx context.Context, id string) error {
+	oldBook := &models.Book{}
+	if err := d.DB.First(oldBook, id).Error; err == nil {
+		tx := d.DB.Delete(oldBook)
+		if tx.Error != nil {
+			return err
+		}
+		tx.Commit()
+		return nil
+	}
+	return errors.ErrNotFound
+}

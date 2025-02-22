@@ -19,6 +19,7 @@ v, err = c.Receive() // reply from GET
 type CacheInterface interface {
 	Set(ctx context.Context, keyValue *RedisKeyValue) error
 	SetMultipleKeys(ctx context.Context, keyValues []*RedisKeyValue) error
+	DeleteKey(ctx context.Context, key ...string) (interface{}, error)
 	Get(ctx context.Context, key string) (interface{}, error)
 	GetMultiple(ctx context.Context, keys ...interface{}) ([]string, error)
 	GetAllKeys(ctx context.Context, patteren ...string) ([]interface{}, error)
@@ -91,6 +92,17 @@ func (client *RedisClient) SetMultipleKeys(ctx context.Context, keyValues []*Red
 		return err
 	}
 	return nil
+}
+
+func (client *RedisClient) DeleteKey(ctx context.Context, key ...string) (interface{}, error) {
+	redisConn := client.pool.Get()
+	defer closeConnection(ctx, redisConn)
+
+	value, err := redis.String(redisConn.Do("DEL", key))
+	if err != nil {
+		return nil, err
+	}
+	return value, nil
 }
 
 func (client *RedisClient) Get(ctx context.Context, key string) (interface{}, error) {

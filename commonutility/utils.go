@@ -14,3 +14,7 @@ func GetContext(ctx *gin.Context) context.Context {
 func GetCacheKey(id string) string {
 	return "BookId::" + id
 }
+
+func GetAllBooksKey() string {
+	return "AllBooks"
+}

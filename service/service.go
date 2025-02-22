@@ -31,6 +31,7 @@ func (s *ServiceStruct) CreateBook(ctx context.Context, book *models.Book) error
 	if id == 0 {
 		return errors.ErrNotCreated
 	}
+	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKey())
 	return nil
 }
 
@@ -47,13 +48,52 @@ func (s *ServiceStruct) ReadBook(ctx context.Context, id string) (*models.Book, 
 		return nil, errors.ErrInternal
 	}
 
-	booksJson, _ := json.Marshal(book)
-	s.Cache.Set(ctx, &epredis.RedisKeyValue{Key: commonutility.GetCacheKey(id), Value: booksJson})
+	s.Cache.Set(ctx, &epredis.RedisKeyValue{Key: commonutility.GetCacheKey(id), Value: book, ExpiryInMillis: 60 * 1000})
 
 	return book, nil
 }
 
 func (s *ServiceStruct) ReadAllBooks(ctx context.Context) []models.Book {
-	book := s.DbOps.ReadAllBooks(ctx)
-	return book
+
+	cacheKey := commonutility.GetAllBooksKey()
+	if cachedBooks, err := s.Cache.Get(ctx, cacheKey); err == nil {
+		var books []models.Book
+		json.Unmarshal([]byte(cachedBooks.(string)), &books)
+		return books
+	}
+
+	books := s.DbOps.ReadAllBooks(ctx)
+	s.Cache.Set(ctx, &epredis.RedisKeyValue{Key: cacheKey, Value: books, ExpiryInMillis: 60 * 1000})
+	return books
+}
+
+func (s *ServiceStruct) UpdateBook(ctx context.Context, id string, book *models.Book) error {
+
+	err := validateUpdateBook(id, book)
+	if err != nil {
+		return err
+	}
+
+	err = s.DbOps.UpdateBook(ctx, id, book)
+	if err != nil {
+		return err
+	}
+
+	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKey(), commonutility.GetCacheKey(id))
+	return nil
+}
+
+func (s *ServiceStruct) DeleteBook(ctx context.Context, id string) error {
+	err := validateDeleteBook(id)
+	if err != nil {
+		return err
+	}
+
+	err = s.DbOps.DeleteBook(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKey(), commonutility.GetCacheKey(id))
+	return nil
 }
