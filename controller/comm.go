@@ -2,8 +2,10 @@ package controller
 
 import (
 	"context"
+	"sync"
 
 	"github.com/gauravlad21/book-management-system/dbhelper"
+	"github.com/gauravlad21/book-management-system/external_resources/kafka"
 	epredis "github.com/gauravlad21/book-management-system/external_resources/redis"
 	"github.com/gauravlad21/book-management-system/service"
 )
@@ -30,4 +32,12 @@ func StartupHook(ctx context.Context) {
 	if serviceRepo == nil {
 		InitializeHandlers()
 	}
+
+	kafka.InitKafkaProducer()
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		kafka.StartConsumer()
+	}()
 }

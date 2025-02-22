@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"github.com/gauravlad21/book-management-system/commonutility"
 	"github.com/gauravlad21/book-management-system/errors"
+	"github.com/gauravlad21/book-management-system/external_resources/kafka"
 	epredis "github.com/gauravlad21/book-management-system/external_resources/redis"
 	"github.com/gauravlad21/book-management-system/models"
 
@@ -32,6 +34,8 @@ func (s *ServiceStruct) CreateBook(ctx context.Context, book *models.Book) error
 		return errors.ErrNotCreated
 	}
 	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix())
+
+	kafka.PublishEvent("create", fmt.Sprint(book.ID), book.Title, book.Author, book.Year)
 	return nil
 }
 
@@ -83,6 +87,8 @@ func (s *ServiceStruct) UpdateBook(ctx context.Context, id string, book *models.
 	}
 
 	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix(), commonutility.GetCacheKey(id))
+
+	kafka.PublishEvent("update", fmt.Sprint(book.ID), book.Title, book.Author, book.Year)
 	return nil
 }
 
@@ -98,5 +104,7 @@ func (s *ServiceStruct) DeleteBook(ctx context.Context, id string) error {
 	}
 
 	s.Cache.DeleteKey(ctx, commonutility.GetAllBooksKeyPrefix(), commonutility.GetCacheKey(id))
+
+	kafka.PublishEvent("delete", fmt.Sprint(id), "", "", 0)
 	return nil
 }
