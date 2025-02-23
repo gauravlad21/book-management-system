@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"os"
 	"time"
 
 	"github.com/segmentio/kafka-go"
@@ -28,7 +29,7 @@ type BookEvent struct {
 // Initialize Kafka Producer
 func InitKafkaProducer() {
 	KafkaWriter = &kafka.Writer{
-		Addr:     kafka.TCP("localhost:9092"),
+		Addr:     kafka.TCP(os.Getenv("KAFKA_BROKER")),
 		Topic:    KafkaTopic,
 		Balancer: &kafka.LeastBytes{},
 	}

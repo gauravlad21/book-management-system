@@ -340,7 +340,7 @@ func (client *RedisClient) CopyKey(ctx context.Context, sourceKey, destinationKe
 
 func createRedisPool() *redis.Pool {
 	defer fmt.Println("createRedisPool Done")
-	redisHost := viper.GetString("redis.host")
+	redisHost := viper.GetString("REDIS_HOST")
 	redisPort := viper.GetString("redis.port")
 	redisPassword := viper.GetString("redis.password")
 	redisAddr := fmt.Sprintf("%s:%s", redisHost, redisPort)

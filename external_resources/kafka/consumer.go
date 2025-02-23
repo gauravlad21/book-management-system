@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/segmentio/kafka-go"
 )
@@ -11,7 +12,7 @@ import (
 // StartConsumer listens for Kafka events
 func StartConsumer() {
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{"localhost:9092"},
+		Brokers:  []string{os.Getenv("KAFKA_BROKER")},
 		GroupID:  "book_consumer_group",
 		Topic:    KafkaTopic,
 		MinBytes: 10e3,
