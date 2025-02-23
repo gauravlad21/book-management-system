@@ -147,4 +147,23 @@ paths:
       summary: Update a book
       tags:
       - Books
+  /events:
+    get:
+      description: Kafka message received by Post, Put, Delete event
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Kafka Consumer
+      tags:
+      - Books
 swagger: "2.0"

@@ -209,6 +209,35 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/events": {
+            "get": {
+                "description": "Kafka message received by Post, Put, Delete event",
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Kafka Consumer",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
