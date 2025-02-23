@@ -5,8 +5,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/segmentio/kafka-go"
+)
+
+var (
+	messageBuffer []string   // Store received messages
+	mu            sync.Mutex // Ensure thread safety
 )
 
 // StartConsumer listens for Kafka events
@@ -28,6 +34,21 @@ func StartConsumer() {
 			continue
 		}
 
+		mu.Lock()
+		messageBuffer = append(messageBuffer, string(msg.Value))
+		if len(messageBuffer) > 100 { // Limit buffer size
+			messageBuffer = messageBuffer[1:]
+		}
+		mu.Unlock()
+
 		fmt.Printf("Received event: %s\n", string(msg.Value))
 	}
+}
+func GetEvents(ctx context.Context) []string {
+	mu.Lock()
+	messages := make([]string, len(messageBuffer))
+	copy(messages, messageBuffer)
+	mu.Unlock()
+	return messages
+
 }

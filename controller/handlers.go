@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gauravlad21/book-management-system/commonutility"
+	"github.com/gauravlad21/book-management-system/external_resources/kafka"
 	"github.com/gauravlad21/book-management-system/models"
 
 	"github.com/gin-gonic/gin"
@@ -124,4 +125,17 @@ func DeleteBook(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(200, gin.H{"Message": fmt.Sprintf("Successfully Deleted id: %v", id)})
+}
+
+// Kafka Consumer
+// @Summary Kafka Consumer
+// @Description Kafka message received by Post, Put, Delete event
+// @Tags Books
+// @Success 200 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /events [get]
+// @host localhost:5002
+func GetEvents(ctx *gin.Context) {
+	messages := kafka.GetEvents(commonutility.GetContext(ctx))
+	ctx.JSON(http.StatusOK, gin.H{"events": messages})
 }

@@ -39,5 +39,7 @@ func init() {
 		{Url: "/books", Method: GET, Handler: controller.ReadAllBooks},
 		{Url: "/books/:id", Method: PUT, Handler: controller.UpdateBook},
 		{Url: "/books/:id", Method: DELETE, Handler: controller.DeleteBook},
+
+		{Url: "/events", Method: GET, Handler: controller.GetEvents},
 	}
 }
