@@ -28,7 +28,7 @@ func Hello(ctx *gin.Context) {
 // @Success 201 {object} models.Book
 // @Failure 400 {object} map[string]string
 // @Router /books [post]
-// @host http://13.51.170.227:5002
+// @host 13.48.212.214
 func CreateBook(ctx *gin.Context) {
 	book := &models.Book{}
 	ctx.BindJSON(&book)
@@ -49,7 +49,7 @@ func CreateBook(ctx *gin.Context) {
 // @Success 200 {object} models.Book
 // @Failure 404 {object} map[string]string
 // @Router /books/{id} [get]
-// @host http://13.51.170.227:5002
+// @host 13.48.212.214
 func ReadBook(ctx *gin.Context) {
 	id := ctx.Param("id")
 	book, err := serviceRepo.ReadBook(commonutility.GetContext(ctx), id)
@@ -67,7 +67,7 @@ func ReadBook(ctx *gin.Context) {
 // @Produce  json
 // @Success 200 {array} models.Book
 // @Router /books [get]
-// @host http://13.51.170.227:5002
+// @host 13.48.212.214
 func ReadAllBooks(ctx *gin.Context) {
 	limitStr := ctx.Request.URL.Query().Get("limit")
 	offsetStr := ctx.Request.URL.Query().Get("offset")
@@ -95,7 +95,7 @@ func ReadAllBooks(ctx *gin.Context) {
 // @Failure 400 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /books/{id} [put]
-// @host http://13.51.170.227:5002
+// @host 13.48.212.214
 func UpdateBook(ctx *gin.Context) {
 	id := ctx.Param("id")
 	book := &models.Book{}
@@ -116,7 +116,7 @@ func UpdateBook(ctx *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /books/{id} [delete]
-// @host http://13.51.170.227:5002
+// @host 13.48.212.214
 func DeleteBook(ctx *gin.Context) {
 	id := ctx.Param("id")
 	err := serviceRepo.DeleteBook(commonutility.GetContext(ctx), id)
@@ -134,7 +134,7 @@ func DeleteBook(ctx *gin.Context) {
 // @Success 200 {object} map[string]string
 // @Failure 404 {object} map[string]string
 // @Router /events [get]
-// @host http://13.51.170.227:5002
+// @host 13.48.212.214
 func GetEvents(ctx *gin.Context) {
 	messages := kafka.GetEvents(commonutility.GetContext(ctx))
 	ctx.JSON(http.StatusOK, gin.H{"events": messages})
