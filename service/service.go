@@ -17,17 +17,19 @@ import (
 
 func (s *ServiceStruct) Hello(ctx context.Context) string {
 	commonutility.GetLogger().Info("Hello from service", zap.Any("someKey", "someValue"))
-	return "hello from |" + viper.GetString("value") + "| charting-engine service"
+	return "hello from |" + viper.GetString("value") + "| book-managment-service"
 }
 
 func (s *ServiceStruct) CreateBook(ctx context.Context, book *models.Book) error {
 	err := validateCreateBook(book)
 	if err != nil {
+		commonutility.GetLogger().Error("validation error", zap.Any("book", book), zap.Error(err))
 		return err
 	}
 
 	id, err := s.DbOps.CreateBook(ctx, book)
 	if err != nil {
+		commonutility.GetLogger().Error("DbOps::CreateBook error", zap.Any("book", book), zap.Error(err))
 		return errors.ErrInternal
 	}
 	if id == 0 {
@@ -49,6 +51,7 @@ func (s *ServiceStruct) ReadBook(ctx context.Context, id string) (*models.Book, 
 
 	book, err := s.DbOps.ReadBook(ctx, id)
 	if err != nil {
+		commonutility.GetLogger().Error("DbOps::ReadBook error", zap.Any("id", id), zap.Error(err))
 		return nil, errors.ErrInternal
 	}
 
@@ -78,11 +81,13 @@ func (s *ServiceStruct) UpdateBook(ctx context.Context, id string, book *models.
 
 	err := validateUpdateBook(id, book)
 	if err != nil {
+		commonutility.GetLogger().Error("validateUpdateBook error", zap.Any("id", id), zap.Any("book", book), zap.Error(err))
 		return err
 	}
 
 	err = s.DbOps.UpdateBook(ctx, id, book)
 	if err != nil {
+		commonutility.GetLogger().Error("DbOps::UpdateBook error", zap.Any("id", id), zap.Any("book", book), zap.Error(err))
 		return err
 	}
 
@@ -96,11 +101,13 @@ func (s *ServiceStruct) UpdateBook(ctx context.Context, id string, book *models.
 func (s *ServiceStruct) DeleteBook(ctx context.Context, id string) error {
 	err := validateDeleteBook(id)
 	if err != nil {
+		commonutility.GetLogger().Error("validateUpdateBook error", zap.Any("id", id), zap.Error(err))
 		return err
 	}
 
 	err = s.DbOps.DeleteBook(ctx, id)
 	if err != nil {
+		commonutility.GetLogger().Error("DbOps::DeleteBook error", zap.Any("id", id), zap.Error(err))
 		return err
 	}
 
