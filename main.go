@@ -53,7 +53,7 @@ func initAndStartServer() {
 // @title Books Management API
 // @version 1.0
 // @description This is a Books Management API using Gin, GORM, Redis, and Kafka.
-// @host 13.48.212.214
+// @host 13.48.212.214:5002
 // @BasePath /
 func main() {
 

@@ -11,7 +11,7 @@ definitions:
       year:
         type: integer
     type: object
-host: 13.48.212.214
+host: 13.48.212.214:5002
 info:
   contact: {}
   description: This is a Books Management API using Gin, GORM, Redis, and Kafka.
