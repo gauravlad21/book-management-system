@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:5002",
+    "host": "http://13.51.170.227:5002",
     "basePath": "/",
     "paths": {
         "/books": {
